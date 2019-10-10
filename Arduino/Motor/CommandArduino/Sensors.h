@@ -5,10 +5,11 @@
 #include "ArduinoSort.h"
 
 SharpIR SR1(SharpIR::GP2Y0A21YK0F, A4);
+SharpIR SR2(SharpIR::GP2Y0A21YK0F, A3);
 SharpIR SR3(SharpIR::GP2Y0A21YK0F, A2);
 SharpIR SR4(SharpIR::GP2Y0A21YK0F, A5);
-SharpIR LR1(SharpIR::GP2Y0A02YK0F, A0);
-SharpIR SR5(SharpIR::GP2Y0A21YK0F, A1);
+SharpIR LR1(SharpIR::GP2Y0A02YK0F, A1);
+SharpIR SR5(SharpIR::GP2Y0A21YK0F, A0);
 
 void printArray(String msg, int* arraySR1) {
   Serial.print(msg);
@@ -54,7 +55,7 @@ float returnSrDist (int x, SharpIR y){
   }
 String returnSensorData(){
   float SR1_distance = returnSrDist(20,SR1);
-  float SR2_distance = 0;
+  float SR2_distance = returnSrDist(20,SR2);
   float SR3_distance = returnSrDist(20,SR3);
   float SR4_distance = returnSrDist(20,SR4);
   float LR1_distance = returnLrDist(20,LR1);

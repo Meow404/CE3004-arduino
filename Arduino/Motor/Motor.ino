@@ -14,18 +14,20 @@ float avgSpeeds2[25];
 int count1 = 0;
 int count2 = 0;
 int timer1_counter;
-float M1k = 0.386704;
+float M1k = 0.371285;
 double M1ts = 0.00375;//78,0.00565
-double M1td = 0.047;//0.07625;
+double M1td = 0.057;//0.047;//0.07625;
 float M1k1, M1k2, M1k3;
-float M2k = 0.381448;
+float M2k = 0.401039;
 float M2ts = 0.0043;//77;
-float M2td = 0.049;
+float M2td = 0.0585;
 float M2k1, M2k2, M2k3;
 float errorCtrl = 2;
 float error1[3] = {0, 0, 0};
 float error2[3] = {0, 0, 0};
-float setSpeed1, setSpeed2, rpm = 100, rpm1, rpm2;
+float setSpeed1, setSpeed2, rpm = 100;
+float totalCount;
+long errorCount;
 #define ledPin 13
 
 void stopIfFault()
@@ -59,6 +61,9 @@ void setup()
   setSpeed1 = 0;
   setSpeed2 = 0;
 
+  errorCount = 0;
+  totalCount = 0;
+
   md.init();
 
   md.setM1Speed(setSpeed1);
@@ -89,7 +94,17 @@ void loop() {
   //  Serial.print(setSpeed1);
   //  Serial.print("Set Speed 2 : ");
   //  Serial.println(setSpeed2);
-
+  if(totalCount == 100){
+    Serial.println();
+    Serial.println("~~~~~");
+    Serial.print("Error Rate : ");
+    Serial.println(errorCount/totalCount);
+    Serial.println("~~~~~");
+    Serial.println();
+    errorCount = 0;
+    totalCount = 0;
+    }
+totalCount+=1;
 
   delay(50);
 
@@ -103,8 +118,10 @@ void loop() {
   Serial.print(" | ");
 //  Serial.print(motorSpeed2 - motorSpeed1);
 
-  if(fabs(rpm - motorSpeed2)>errorCtrl)
-  Serial.println(" ~~~");
+  if(fabs(motorSpeed1 - motorSpeed2)>2*errorCtrl)
+  {
+  errorCount++;
+  Serial.println(" ~~~");}
   else
   Serial.println();
 
@@ -150,8 +167,8 @@ void loop() {
 
 //void loop() {
 //  Serial.println("Speed set : 250");
-//  md.setM1Speed(250);
-//  md.setM2Speed(250);
+//  md.setM1Speed(300);
+//  md.setM2Speed(300);
 //  for (int i = 0; i < 16000; i++)
 //    if (i % 100 == 0)
 //    { findSpeed();
@@ -160,8 +177,8 @@ void loop() {
 //  Serial.print(millis());
 //  Serial.print(", ");
 //  Serial.println("Speed set : 300");
-//  md.setM1Speed(300);
-//  md.setM2Speed(300);
+//  md.setM1Speed(350);
+//  md.setM2Speed(350);
 //  for (int i = 0; i < 16000; i++)
 //    if (i % 100 == 0)
 //    { findSpeed();
@@ -172,42 +189,41 @@ void loop() {
 //  md.setM2Speed(0);
 //  delay(100000);
 //}
-//
+
 //void loop()
 //{ float speed_E1A, speed_E2A, speed_E1B, speed_E2B;
-//  for (int j = 1; j <= 8; j++) {
-//    resetAvgSpeed(1);
-//    //resetAvgSpeed(2);
-//    long speed = j * 50;
+//  for (int j = 5; j <= 40; j++) {
+////    resetAvgSpeed(1);
+//    resetAvgSpeed(2);
+//    long speed = j * 10;
 //    for (int i = 0; i <= 2000; i++)
 //    {
-//      md.setM1Speed(speed);
-//      //md.setM2Speed(speed);
+////      md.setM1Speed(speed);
+//      md.setM2Speed(speed);
 //      stopIfFault();
 //      if (i % 200 == 100)
 //      {
-//        speed_E1A = getSpeed(pulseIn(E1A, HIGH));
-//        speed_E1B = getSpeed(pulseIn(E1B, HIGH));
-//        addAvgSpeed(1, speed_E1A);
-//        addAvgSpeed(1, speed_E1B);
+////        speed_E1A = getSpeed(pulseIn(E1A, HIGH));
+////        speed_E1B = getSpeed(pulseIn(E1B, HIGH));
+////        addAvgSpeed(1, speed_E1A);
+////        addAvgSpeed(1, speed_E1B);
 //
-////        speed_E2A = getSpeed(pulseIn(E2A, HIGH));
-////        speed_E2B = getSpeed(pulseIn(E2B, HIGH));
-////        addAvgSpeed(2, speed_E2A);
-////        addAvgSpeed(2, speed_E2B);
+//        speed_E2A = getSpeed(pulseIn(E2A, HIGH));
+//        speed_E2B = getSpeed(pulseIn(E2B, HIGH));
+//        addAvgSpeed(2, speed_E2A);
+//        addAvgSpeed(2, speed_E2B);
 //      }
 //      delay(2);
 //    }
-//    Serial.print("Speed : " );
-//    Serial.println(speed);
-//    Serial.print("M1 : ");
-//    Serial.print(getAvgSpeed(1));
-//    Serial.print(", ");
-//    Serial.println(sortAndAverage(avgSpeeds1, count1));
-////    Serial.print("M2 : ");
-////    Serial.print(getAvgSpeed(2));
+//    Serial.print(speed);
 ////    Serial.print(", ");
-////    Serial.println(sortAndAverage(avgSpeeds2, count2));
+////    Serial.print(getAvgSpeed(1));
+////    Serial.print(", ");
+////    Serial.println(sortAndAverage(avgSpeeds1, count1));
+//    Serial.print(", ");
+//    Serial.print(getAvgSpeed(2));
+//    Serial.print(", ");
+//    Serial.println(sortAndAverage(avgSpeeds2, count2));
 //  }
 //
 //}
