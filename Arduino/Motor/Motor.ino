@@ -228,6 +228,14 @@ totalCount+=1;
 //
 //}
 
+//void calibrate(){
+//  for(i=0;i<10;i++){
+//    md.setSpeeds(350,350);
+//    delay(1000);
+//    md.setBrakes(400,400);
+//    delay(1000);
+//  }
+//}
 void errorUpdate(float error[]) {
   error[2] = error[1];
   error[1] = error[0];

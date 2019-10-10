@@ -50,16 +50,17 @@ void setup() {
 
   md.init();           // enable all interrupts
 }
-
+//
 //void loop() {
-//  moveForward(10);
-//  delay(4000);
-//  turnRight(180);
-//  delay(4000);
-//  moveForward(120);
-//  delay(4000);
-//  turnLeft(180);
-//  delay(4000);
+//  avoidObstacle(200);
+////  moveForward(10);
+////  delay(4000);
+////  turnRight(180);
+////  delay(4000);
+////  moveForward(120);
+////  delay(4000);
+////  turnLeft(180);
+////  delay(4000);
 //}
 
 
@@ -83,7 +84,7 @@ void loop() {
     switch (instructions) {
       //botstart88
       case 'S':
-        calibrateLeftSide();
+        //calibrateLeftSide();
         sensorData = returnSensorData();
         Serial.println("X_SENDATA" + sensorData);
         break;
@@ -141,7 +142,7 @@ void loop() {
       case 'C':
         Serial.println("FYI! Bot calibrating");
         if (secondVal == 0)
-          calibrateFront();
+          calibrateDistance();
         else if (secondVal == 1)
           calibrateLeftSide();
         Serial.println("X_CALIBRATIONDONE");
@@ -157,26 +158,26 @@ void calibrateLeftSide() {
   while (fabs(frontSensor - backDistance) != 5) {
     if (frontSensor - backDistance > 5) {
       md.setSpeeds(350, -350);
-      delay(25);
+      delay(10);
       md.setM1Brake(400);
       md.setM2Brake(400);
-      delay(50);
+      delay(30);
     }
     if (frontSensor - backDistance < 5) {
       md.setSpeeds(-350, 350);
-      delay(25);
+      delay(10);
       md.setM2Brake(400);
       md.setM1Brake(400);
-      delay(50);
+      delay(30);
     }
     frontSensor = SR4.getDistance(false) + 2;
     backDistance = SR5.getDistance(false) + 2;
   }
   md.setSpeeds(-350, 350);
-      delay(25);
+      delay(10);
       md.setM2Brake(400);
       md.setM1Brake(400);
-      delay(50);
+      delay(30);
 }
 //
 //void calibrateRightSide() {
@@ -212,27 +213,69 @@ void calibrateLeftSide() {
 //}
 
 void calibrateFront() {
-  float frontSensor = SR1.getDistance(false) + 2;
-  float backDistance = SR3.getDistance(false) + 2;
-  while (fabs(frontSensor - backDistance) != 0) {
-    if (frontSensor - backDistance < 0) {
+  float rightDistance = SR1.getDistance(false) + 2;
+  float leftDistance = SR3.getDistance(false) + 2;
+  while (fabs(rightDistance - leftDistance) != 0) {
+    if (rightDistance - leftDistance < 0) {
       md.setSpeeds(350, -350);
       delay(25);
       md.setM1Brake(400);
       md.setM2Brake(400);
       delay(50);
     }
-    if (frontSensor - backDistance > 0) {
+    if (rightDistance - leftDistance > 0) {
       md.setSpeeds(-350, 350);
       delay(25);
       md.setM2Brake(400);
       md.setM1Brake(400);
       delay(50);
     }
-    frontSensor = SR1.getDistance(false) + 2;
-    backDistance = SR3.getDistance(false) + 2;
+    rightDistance = SR1.getDistance(false) + 2;
+    leftDistance = SR3.getDistance(false) + 2;
   }
 }
+
+void calibrateDistance(){
+
+  float rightDistance = SR1.getDistance(false) + 2;
+  float leftDistance = SR3.getDistance(false) + 2;
+
+  if(fabs(rightDistance - leftDistance) != 0){
+    calibrateFront();
+    }
+
+    rightDistance = SR1.getDistance(false) + 2;
+    leftDistance = SR3.getDistance(false) + 2;
+
+    float setM1, setM2;
+    
+  while (rightDistance!=13 && leftDistance!=13) {
+    
+    if (rightDistance < 13) 
+      setM1 = -350;
+    else if(rightDistance > 13)
+      setM1 =350;
+    else 
+      setM1 = 0;
+    
+    if (leftDistance < 13) 
+      setM2 = -350;
+    else if(leftDistance > 13)
+      setM2 =350;
+    else 
+      setM2 = 0;
+
+    md.setSpeeds(setM1, setM2);
+      delay(25);
+      md.setM2Brake(400);
+      md.setM1Brake(400);
+      delay(50);
+     
+    rightDistance = SR1.getDistance(false) + 2;
+    leftDistance = SR3.getDistance(false) + 2;
+  }
+  
+  }
 
 void avoidObstacle(float distance) {
   long runningTime = round(runTime(rpm1, distance));
@@ -245,16 +288,16 @@ void avoidObstacle(float distance) {
     if (count % 15 == 0) {
       //      dist[2] = dist[1];
       //      dist[1] = dist[0];
-      dist[0] = SR1.getDistance(false) + 2;
+      dist[0] = SR2.getDistance(false) + 2;
       Serial.println(dist[0]);
       //      float avgDist = (dist[0] + dist[1] + dist[2]) / 3.0;
       //      Serial.print("Average Distance : ");
       //      Serial.println(avgDist);
-      if ( dist[0] <= 20) {
+      if ( dist[0] <= 15) {
         Serial.println(dist[0]);
         stopMovement();
-        float collisionDistance = returnSrDist (20 , SR1);
-        float travelDistance = sqrt(pow(collisionDistance, 2) + 256) + 30;
+        float collisionDistance = returnSrDist (20 , SR2);
+        float travelDistance = sqrt(pow(collisionDistance, 2) + 256) + 25 ;
         Serial.println(travelDistance);
         delay(500);
         turnRight(45);
@@ -263,9 +306,9 @@ void avoidObstacle(float distance) {
         delay(500);
         turnLeft(90);
         delay(500);
-        moveForward(travelDistance + 7.5);
+        moveForward(travelDistance-5);
         delay(500);
-        turnRight(45);
+        turnRight(55);
         delay(500);
       }
     } count++;
@@ -330,8 +373,8 @@ void moveBackward(float distance) {
 }
 
 void stopMovement() {
-  md.setM1Speed(0);
-  md.setM2Speed(0);
+  md.setM2Brake(400);
+  md.setM1Brake(400);
 }
 
 void turnLeft(float angle) {
@@ -349,8 +392,7 @@ void turnLeft(float angle) {
       md.setM2Speed(setSpeed2);
     stopTime = millis();
   }
-  md.setM1Brake(400);
-  md.setM2Brake(400);
+  stopMovement();
 }
 
 void turnRight(float angle) {
@@ -368,8 +410,11 @@ void turnRight(float angle) {
       md.setM2Speed(setSpeed2);
     stopTime = millis();
   }
-  md.setM1Brake(400);
-  md.setM2Brake(400);
+  stopMovement();
+
+
+
+  
 }
 
 float runTime(float rpm, float distance) {
@@ -381,12 +426,12 @@ float runTime(float rpm, float distance) {
 
 
 float rotateArduino(float rpm, float angle) {
-  float radius = 9;
+  float radius = 9.665;
   float wheelRadius = 3;
   float distance = (2 * Pi * radius * angle) / 360.0;
   float Speed = (rpm * 2 * Pi * wheelRadius) / 60000.0; // Speed in cm/millisecond
   float rotateTime = distance / Speed;
-  return rotateTime + 1540 ;//1700; //
+  return rotateTime + 1415 ;//1700; //
 }
 
 float setWheelSpeed1(float rpm, bool forward) {
