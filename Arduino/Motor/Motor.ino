@@ -88,107 +88,107 @@ void findSpeed(void)
 }
 
 
-void loop() {
-
-  //  Serial.print("Set Speed 1 : ");
-  //  Serial.print(setSpeed1);
-  //  Serial.print("Set Speed 2 : ");
-  //  Serial.println(setSpeed2);
-  if(totalCount == 100){
-    Serial.println();
-    Serial.println("~~~~~");
-    Serial.print("Error Rate : ");
-    Serial.println(errorCount/totalCount);
-    Serial.println("~~~~~");
-    Serial.println();
-    errorCount = 0;
-    totalCount = 0;
-    }
-totalCount+=1;
-
-  delay(50);
-
-  float motorSpeed1 = getSpeed (pulseIn(E1B, HIGH));
-  float motorSpeed2 = getSpeed (pulseIn(E2A, HIGH));
-//    Serial.print(", Motor Speed 1 : ");
-  Serial.print(motorSpeed1);
-  Serial.print(" | ");
-////    Serial.print(", Motor Speed 2 : ");
-  Serial.print(motorSpeed2);
-  Serial.print(" | ");
-//  Serial.print(motorSpeed2 - motorSpeed1);
-
-  if(fabs(motorSpeed1 - motorSpeed2)>2*errorCtrl)
-  {
-  errorCount++;
-  Serial.println(" ~~~");}
-  else
-  Serial.println();
-
-  if (motorSpeed1 > 150)
-    motorSpeed1 = 0;
-
-  if (motorSpeed2 > 150)
-    motorSpeed2 = 0;
-
-  errorUpdate(error1);
-  error1[0] = rpm - motorSpeed1 ;
-  errorUpdate(error2);
-  error2[0] = rpm - motorSpeed2 ;
-
-  if (fabs(error1[0]) > errorCtrl ) {
-    //    Serial.print(millis());
-
-    if (motorSpeed1 < 150)
-      setSpeed1 = correctedSpeed(setSpeed1, error1[0], error1[1], error1[2], 1);
-    else
-      error1[0] = 0;
-
-    md.setM1Speed(setSpeed1);
-    //      Serial.print("New Set Speed 1 : ");
-    //      Serial.println(setSpeed1);
-    //      Serial.println();
-  }
-
-  if (fabs(error2[0]) > errorCtrl) {
-    //      Serial.print(millis());
-
-    if (motorSpeed2 < 150)
-      setSpeed2 = correctedSpeed(setSpeed2, error2[0], error2[1], error2[2], 2);
-    else
-      error2[0] = 10;
-
-    md.setM2Speed(setSpeed2);
-    //      Serial.print(", New Set Speed 2 : ");
-    //      Serial.println(setSpeed2);
-  }
-
-}
-
 //void loop() {
-//  Serial.println("Speed set : 250");
-//  md.setM1Speed(300);
-//  md.setM2Speed(300);
-//  for (int i = 0; i < 16000; i++)
-//    if (i % 100 == 0)
-//    { findSpeed();
-//      delay(10);
+//
+//  //  Serial.print("Set Speed 1 : ");
+//  //  Serial.print(setSpeed1);
+//  //  Serial.print("Set Speed 2 : ");
+//  //  Serial.println(setSpeed2);
+//  if(totalCount == 100){
+//    Serial.println();
+//    Serial.println("~~~~~");
+//    Serial.print("Error Rate : ");
+//    Serial.println(errorCount/totalCount);
+//    Serial.println("~~~~~");
+//    Serial.println();
+//    errorCount = 0;
+//    totalCount = 0;
 //    }
-//  Serial.print(millis());
-//  Serial.print(", ");
-//  Serial.println("Speed set : 300");
-//  md.setM1Speed(350);
-//  md.setM2Speed(350);
-//  for (int i = 0; i < 16000; i++)
-//    if (i % 100 == 0)
-//    { findSpeed();
-//      delay(10);
-//    }
-//  Serial.println("Speed set : 0");
-//  md.setM1Speed(0);
-//  md.setM2Speed(0);
-//  delay(100000);
+//totalCount+=1;
+//
+//  delay(50);
+//
+//  float motorSpeed1 = getSpeed (pulseIn(E1B, HIGH));
+//  float motorSpeed2 = getSpeed (pulseIn(E2A, HIGH));
+////    Serial.print(", Motor Speed 1 : ");
+//  Serial.print(motorSpeed1);
+//  Serial.print(" | ");
+//////    Serial.print(", Motor Speed 2 : ");
+//  Serial.print(motorSpeed2);
+//  Serial.print(" | ");
+////  Serial.print(motorSpeed2 - motorSpeed1);
+//
+//  if(fabs(motorSpeed1 - motorSpeed2)>2*errorCtrl)
+//  {
+//  errorCount++;
+//  Serial.println(" ~~~");}
+//  else
+//  Serial.println();
+//
+//  if (motorSpeed1 > 150)
+//    motorSpeed1 = 0;
+//
+//  if (motorSpeed2 > 150)
+//    motorSpeed2 = 0;
+//
+//  errorUpdate(error1);
+//  error1[0] = rpm - motorSpeed1 ;
+//  errorUpdate(error2);
+//  error2[0] = rpm - motorSpeed2 ;
+//
+//  if (fabs(error1[0]) > errorCtrl ) {
+//    //    Serial.print(millis());
+//
+//    if (motorSpeed1 < 150)
+//      setSpeed1 = correctedSpeed(setSpeed1, error1[0], error1[1], error1[2], 1);
+//    else
+//      error1[0] = 0;
+//
+//    md.setM1Speed(setSpeed1);
+//    //      Serial.print("New Set Speed 1 : ");
+//    //      Serial.println(setSpeed1);
+//    //      Serial.println();
+//  }
+//
+//  if (fabs(error2[0]) > errorCtrl) {
+//    //      Serial.print(millis());
+//
+//    if (motorSpeed2 < 150)
+//      setSpeed2 = correctedSpeed(setSpeed2, error2[0], error2[1], error2[2], 2);
+//    else
+//      error2[0] = 10;
+//
+//    md.setM2Speed(setSpeed2);
+//    //      Serial.print(", New Set Speed 2 : ");
+//    //      Serial.println(setSpeed2);
+//  }
+//
 //}
+
+void loop() {
+  Serial.println("Speed set : 250");
+  md.setM1Speed(300);
+  md.setM2Speed(300);
+  for (int i = 0; i < 16000; i++)
+    if (i % 100 == 0)
+    { findSpeed();
+      delay(10);
+    }
+  Serial.print(millis());
+  Serial.print(", ");
+  Serial.println("Speed set : 300");
+  md.setM1Speed(350);
+  md.setM2Speed(350);
+  for (int i = 0; i < 16000; i++)
+    if (i % 100 == 0)
+    { findSpeed();
+      delay(10);
+    }
+  Serial.println("Speed set : 0");
+  md.setM1Speed(0);
+  md.setM2Speed(0);
+  delay(100000);
+}
 
 //void loop()
 //{ float speed_E1A, speed_E2A, speed_E1B, speed_E2B;
