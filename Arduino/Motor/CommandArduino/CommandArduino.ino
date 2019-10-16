@@ -23,7 +23,7 @@ float errorCtrl = 2;
 float error1[3] = {0, 0, 0};
 float error2[3] = {0, 0, 0};
 float setSpeed1, setSpeed2, angle = 90;
-float rpm1 = 105, rpm2 = 106;
+float rpm1 = 105, rpm2 = 105;
 long startTime, stopTime;
 float calibrationOffset = -30;
 float turnOffset = 25;
@@ -82,96 +82,146 @@ void loop() {
     //    }
     //
     //    char instructions = firstVal[0];
-    switch (instructions) {
-      //botstart88
-      case 1:
-        Serial.println("X_BOTREADY");
-        break;
-      //moveforward
-      case 2:
-        //calibrateLeftSide();
-        sensorData = returnSensorData();
-        Serial.println("X_SENDATA" + sensorData);
-        break;
-      //moveforward
-      case 3:
-        //Serial.println("X Bot forward");
-        moveForward(secondVal);
-        Serial.println("X_BOTDONE");
-        break;
-      //turn 90 deg left
-      case 4:
-        //Serial.println("X Bot turn left");
-        turnLeft(90);
-        Serial.println("X_BOTDONE");
-        break;
-      //turn 90 deg right
-      case 5:
-        //Serial.println("X Bot turn right");
-        turnRight(90);
-        Serial.println("X_BOTDONE");
-        break;
-      //bot backward
-      case 6:
-        //Serial.println("X Bot backward");
-        moveBackward(secondVal);
-        Serial.println("X_BOTDONE");
-        break;
-      //turn 180 deg leftt
-      case 7:
-        //Serial.println("X Bot turn 180 deg left");
-        turnLeft(180);
-        Serial.println("X_BOTDONE");
-        break;
-      //turn 180 deg right
-      case 8:
-        //Serial.println("X Bot turn 180 deg right");
-        turnRight(180);
-        Serial.println("X_BOTDONE");
-        break;
-      //botstop
-      case 9:
-        //Serial.println("X Bot stopped");
-        md.setM1Speed(0);
-        md.setM2Speed(0);
-        Serial.println("X_BOTDONE");
-        break;
-      //calibration
-      case 10:
-        { turnLeft(90);
-          delay(100);
-          calibrateDistance();
-          delay(100);
-          turnRight(90);
-        }
-        //        if (secondVal == 0)
-        //          calibrateDistance();
-        //        else if (secondVal == 1)
-        //          calibrateLeftSide();
-        //        else if (secondVal == 2)
-        //        { turnLeft(90);
-        //          delay(100);
-        //          calibrateDistance();
-        //          delay(100);
-        //          turnRight(90);
-        //        }
-        Serial.println("X_CALIBRATIONDONE");
-        break;
-      case 11 :
-        calibrateDistance();
-        Serial.println("X_CALIBRATIONDONE");
-        break;
-      case 12 :
-        calibrateLeftSide();
-        Serial.println("X_CALIBRATIONDONE");
-        break;
-      case 13 :
-        avoidObstacle(150);
-        break;
-    }
+    controlBot(instructions, 10);
   }
 }
 
+String getFastestPath() {
+  String fastestPath = "";
+  Serial.read();
+  while (fastestPath.equals("")) {
+    fastestPath = Serial.readStringUntil('~');
+  }
+  return fastestPath;
+}
+
+void fastestPath(String fastest_path_code) {
+  String instruction = "";
+  bool getInstruction = false;
+  bool getValue = false;
+  int value = 0;
+
+  do {
+    for (int i = 0; i <= fastest_path_code.length(); i++) {
+      if (fastest_path_code.substring(i, i + 1) == ":" || fastest_path_code.length() == i) {
+        if (!getInstruction) {
+          instruction = fastest_path_code.substring(0, i);
+          fastest_path_code =  fastest_path_code.substring(i + 1);
+          getInstruction = true;
+          break;
+        }
+        else if (!getValue) {
+          value = fastest_path_code.substring(0, i).toInt();
+          fastest_path_code =  fastest_path_code.substring(i + 1);
+          getValue = true;
+          break;
+        }
+      }
+    }
+    if (getValue && getInstruction) {
+      controlBot(instruction.toInt(), value);
+      getInstruction = false;
+      getValue = false;
+      delay(100);
+    }
+  } while (!fastest_path_code.equals(""));
+
+}
+
+void controlBot (int instruction, int secondVal) {
+  switch (instruction) {
+    //botstart88
+    case 1:
+      Serial.println("X_BOTREADY");
+      break;
+    //moveforward
+    case 2:
+      //calibrateLeftSide();
+      sensorData = returnSensorData(8);
+      Serial.println("X_SENDATA" + sensorData);
+      break;
+    //moveforward
+    case 3:
+      //Serial.println("X Bot forward");
+      moveForward(secondVal);
+      Serial.println("X_BOTDONE");
+      break;
+    //turn 90 deg left
+    case 4:
+      //Serial.println("X Bot turn left");
+      turnLeft(90);
+      Serial.println("X_BOTDONE");
+      break;
+    //turn 90 deg right
+    case 5:
+      //Serial.println("X Bot turn right");
+      turnRight(90);
+      Serial.println("X_BOTDONE");
+      break;
+    //bot backward
+    case 6:
+      //Serial.println("X Bot backward");
+      moveBackward(secondVal);
+      Serial.println("X_BOTDONE");
+      break;
+    //turn 180 deg leftt
+    case 7:
+      //Serial.println("X Bot turn 180 deg left");
+      turnLeft(180);
+      Serial.println("X_BOTDONE");
+      break;
+    //turn 180 deg right
+    case 8:
+      //Serial.println("X Bot turn 180 deg right");
+      turnRight(180);
+      Serial.println("X_BOTDONE");
+      break;
+    //botstop
+    case 9:
+      //Serial.println("X Bot stopped");
+      md.setM1Speed(0);
+      md.setM2Speed(0);
+      Serial.println("X_BOTDONE");
+      break;
+    //calibration
+    case 10:
+      { turnLeft(90);
+        delay(100);
+        calibrateDistance();
+        delay(100);
+        turnRight(90);
+      }
+      //        if (secondVal == 0)
+      //          calibrateDistance();
+      //        else if (secondVal == 1)
+      //          calibrateLeftSide();
+      //        else if (secondVal == 2)
+      //        { turnLeft(90);
+      //          delay(100);
+      //          calibrateDistance();
+      //          delay(100);
+      //          turnRight(90);
+      //        }
+      Serial.println("X_CALIBRATIONDONE");
+      break;
+    case 11 :
+      calibrateDistance();
+      Serial.println("X_CALIBRATIONDONE");
+      break;
+    case 12 :
+      calibrateLeftSide();
+      Serial.println("X_CALIBRATIONDONE");
+      break;
+    case 13 :
+      avoidObstacle(150);
+      break;
+    case 14 :
+      String fastest_path = getFastestPath();
+      fastestPath(fastest_path);
+      Serial.println("X_FASTESTPATHDONE");
+      break;
+  }
+}
 
 void calibrateLeftSide() {
   float frontSensor = SR4.getDistance(false) + 2;
@@ -270,18 +320,18 @@ void calibrateDistance() {
 
   float setM1, setM2;
 
-  while (rightDistance != 12 && leftDistance != 12) {
+  while (rightDistance != 13 && leftDistance != 13) {
 
-    if (rightDistance < 12)
+    if (rightDistance < 13)
       setM1 = -350;
-    else if (rightDistance > 12)
+    else if (rightDistance > 13)
       setM1 = 350;
     else
       setM1 = 0;
 
-    if (leftDistance < 12)
+    if (leftDistance < 13)
       setM2 = -350;
-    else if (leftDistance > 12)
+    else if (leftDistance > 13)
       setM2 = 350;
     else
       setM2 = 0;
@@ -450,7 +500,7 @@ float runTime(float rpm, float distance) {
   float wheelRadius = 2.65;
   float Speed = (rpm * 2 * Pi * wheelRadius) / 60000.0; // Speed in cm/millisecond
   float runTime = distance / Speed;
-  return runTime + 35; // + 1415;//1462.5 ; //705.375 ;
+  return runTime;// + 35; // + 1415;//1462.5 ; //705.375 ;
 }
 
 
@@ -460,7 +510,7 @@ float rotateArduino(float rpm, float angle) {
   float distance = (2 * Pi * radius * angle) / 360.0;
   float Speed = (rpm * 2 * Pi * wheelRadius) / 60000.0; // Speed in cm/millisecond
   float rotateTime = distance / Speed;
-  return rotateTime + 22.5;//1700; //
+  return rotateTime + 15;// + 22.5;//1700; //
 }
 
 float setWheelSpeed1(float rpm, bool forward) {

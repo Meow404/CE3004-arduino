@@ -23,10 +23,10 @@ void printArray(String msg, int* arraySR1) {
 float returnLrDist (int x, SharpIR y){
   int arraySR1[x];
   for (int i = 0; i < x; i++) {
-    arraySR1[i] = y.getDistance(false) + 10; //When it comes to LR sensor, add a +10 due to unknown offset
+    arraySR1[i] = y.getDistance(false) + .5; //When it comes to LR sensor, add a +10 due to unknown offset
   }
 
-  // Not sorted
+  // Not sorted7
 //  printArray("Not sorted:", arraySR1);
 
   /// Not sorted
@@ -35,7 +35,7 @@ float returnLrDist (int x, SharpIR y){
     sortArray(arraySR1, x);
     //printArray("sortArray:", arraySR1);
     
-    float final = arraySR1[x/2];
+    float final = round(arraySR1[x/2]);
     return final;
   }
 
@@ -53,13 +53,13 @@ float returnSrDist (int x, SharpIR y){
     float final = arraySR1[x/2];
     return final;
   }
-String returnSensorData(){
-  float SR1_distance = returnSrDist(5,SR1);
-  float SR2_distance = returnSrDist(5,SR2);
-  float SR3_distance = returnSrDist(5,SR3);
-  float SR4_distance = returnSrDist(5,SR4);
-  float LR1_distance = returnLrDist(5,LR1);
-  float SR5_distance = returnSrDist(5,SR5);
+String returnSensorData(int count){
+  float SR1_distance = returnSrDist(count,SR1);
+  float SR2_distance = returnSrDist(count,SR2);
+  float SR3_distance = returnSrDist(count,SR3);
+  float SR4_distance = returnSrDist(count,SR4);
+  float LR1_distance = returnLrDist(count,LR1);
+  float SR5_distance = returnSrDist(count,SR5);
 
   return ' '+String(SR1_distance)+' '+String(SR2_distance)+' '+String(SR3_distance)+' '+String(SR4_distance)+' '+String(SR5_distance)+' '+String(LR1_distance);
   }
