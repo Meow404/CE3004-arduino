@@ -23,7 +23,7 @@ void printArray(String msg, int* arraySR1) {
 float returnLrDist (int x, SharpIR y){
   int arraySR1[x];
   for (int i = 0; i < x; i++) {
-    arraySR1[i] = y.getDistance(false) + .5; //When it comes to LR sensor, add a +10 due to unknown offset
+    arraySR1[i] = y.getDistance(false) + 10; //When it comes to LR sensor, add a +10 due to unknown offset
   }
 
   // Not sorted7
